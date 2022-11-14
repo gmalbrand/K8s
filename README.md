@@ -15,6 +15,11 @@ echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
 kubectl create configmap  --dry-run=client <config map name> --from-file=<file or directory path> -o yaml
 ```
 
+* Launch debian container
+```
+kubectl run -i --tty --rm debug --image=debian:latest --restart=Never  -- bash
+```
+
 ## Metrics
 ### Metric server
 
@@ -23,6 +28,22 @@ Details on [GitRepo](https://github.com/kubernetes-sigs/metrics-server)
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 Can generate error with TLS verification. Add `--kubelet-insecure-tls` to container arguments.
+
+Installation with [Helm](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
+
+```
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm upgrade --install metrics-server metrics-server/metrics-server --namespace kube-system --set "args={--kubelet-insecure-tls}"
+```
+
+Check deployment
+
+```
+kubectl get deploy,svc -n kube-system | grep metrics-server
+```
+```
+kubectl get --raw "/apis/metrics.k8s.io/v1beta1/nodes | jq"
+```
 
 ### Node exporter
 
